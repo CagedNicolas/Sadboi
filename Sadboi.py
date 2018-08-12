@@ -16,6 +16,8 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
+    print(discord.version_info)
+    print('------')
 
 @client.event
 async def on_message(message):
@@ -27,9 +29,11 @@ async def on_message(message):
                 counter += 1
 
         await client.edit_message(tmp, 'You have {} messages.'.format(counter))
+
     elif message.content.startswith('!sleep'):
         await asyncio.sleep(5)
         await client.send_message(message.channel, 'Done sleeping')
+
     elif message.content.startswith('!hello'):
         msg = 'Hello {0.author.mention}'.format(message)
         await client.send_message(message.channel, msg)
