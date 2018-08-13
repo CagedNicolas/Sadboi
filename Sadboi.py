@@ -11,6 +11,9 @@ import json
 
 client = discord.Client()
 
+with open('sbdb.json') as f:
+    data = json.load(f) 
+
 @client.event
 async def on_ready():
     print('Logged in as')
@@ -36,5 +39,12 @@ async def on_message(message):
     elif message.content.startswith('!hello'):
         msg = 'Hello {0.author.mention}'.format(message)
         await client.send_message(message.channel, msg)
+
+    elif message.content.startswith('!playlist play'):
+        for plname in data:
+            if message.content in plname['playlist']:
+                msg = plname['songs']
+                await client.send_message(message.channel, '!play' + msg)
+                await asyncio.sleep(3)
 
 client.run('token')
