@@ -37,4 +37,4 @@ async def on_message(message):
         msg = 'Hello {0.author.mention}'.format(message)
         await client.send_message(message.channel, msg)
 
-client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.DlI6jw.GwvzjCSf1kkSWxPzV_zvnl-w7Lc')
+client.run('token')
