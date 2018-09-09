@@ -13,7 +13,7 @@ The bot currently uses "?" as a prefix.
 
 2. Joining and leaving VC (*By using ?join & ?leave commands respectively*)
 
-3. Typing "!play {NameofPlaylist}"  by iterating through sbdb.json for the NameofPlaylist. (*By using ?playlist "NameofPlayList". Currently saved playlists are only placeholders for testing purposes*)
+3. Playing playlists by typing "!play {NameofSonginPlaylist}"  by iterating through sbdb.json for the song names in a playlist. (*By using ?playlist "NameofPlayList". Currently saved playlists are only placeholders for testing purposes*)
 
 4. Clearing messages. Requires mod powers. (*By using ?clear {amount}. Default amount is 10. Will be removed in future updates*)
 
