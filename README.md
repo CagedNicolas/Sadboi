@@ -8,7 +8,7 @@ The bot currently uses "?" as a prefix.
 (Bots using different prefixes require modification of files)
 
 
-## **Current features & How to use them**:
+## **Current features & how to use them**:
 1. Logging messages automatically (*Vague, and will be removed in future updates*)
 
 2. Joining and leaving VC (*By using ?join & ?leave commands respectively*)
