@@ -1,9 +1,9 @@
 # Sadboi
 
-The bot currently uses "?" as a prefix.
-
 A discord bot that saves, loads, and plays playlists for Rythm and other audio bots using the "!" command. 
 However, it still lacks the saving & loading features as it is in pre-alpha phase.
+
+The bot currently uses "?" as a prefix.
 
 (Bots using different prefixes require modification of files)
 
