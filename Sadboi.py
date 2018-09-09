@@ -7,15 +7,16 @@ Has to monitor channel to know when to play and what.
 '''
 import asyncio
 import discord
+from discord.ext import commands
+from discord.ext.commands import Bot
+from discord.voice_client import VoiceClient
 import json
 
-client = discord.Client()
-
-with open('sbdb.json') as f:
-    data = json.load(f) 
+client = commands.Bot(command_prefix='?')
 
 @client.event
 async def on_ready():
+    await client.change_presence(game=discord.Game(name='the crying game'))
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
@@ -23,28 +24,50 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.content.startswith('!test'):
-        counter = 0
-        tmp = await client.send_message(message.channel, 'Calculating messages...')
-        async for log in client.logs_from(message.channel, limit=100):
-            if log.author == message.author:
-                counter += 1
+    print('A user has sent a message.')
+    await client.process_commands(message) # Bot needs this to continue processing the following client.command(s)
 
-        await client.edit_message(tmp, 'You have {} messages.'.format(counter))
+@client.command(pass_context=True)
+async def join(ctx):
+    channel = ctx.message.author.voice.voice_channel # Make error checking incase author isn't in VC
+    await client.say("Joining VC. Make sure you're in VC already!")
+    await client.join_voice_channel(channel)
 
-    elif message.content.startswith('!sleep'):
-        await asyncio.sleep(5)
-        await client.send_message(message.channel, 'Done sleeping')
+@client.command(pass_context=True)
+async def leave(ctx):
+    server = ctx.message.server
+    voice_client = client.voice_client_in(server) # Make error checking incase it isn't in a VC
+    await client.say("Leaving VC. Please give me a moment to collect my things ):")
+    await voice_client.disconnect()
 
-    elif message.content.startswith('!hello'):
-        msg = 'Hello {0.author.mention}'.format(message)
-        await client.send_message(message.channel, msg)
+@client.command(pass_context=True)
+async def playlist(ctx, pl):
+    print("Now loading playlist database...")
+    with open('sbdb.json') as f:
+        data = json.load(f)
+    print("Database loaded.")
 
-    elif message.content.startswith('!playlist play'):
-        for plname in data:
-            if message.content in plname['playlist']:
-                msg = plname['songs']
-                await client.send_message(message.channel, '!play' + msg)
-                await asyncio.sleep(3)
+    for plname in data:
+        if pl in plname['playlist']:
+            songname = plname['songs']
+            await client.say('!play ' + songname)
+            await asyncio.sleep(3)
 
-client.run('token')
+@client.command(pass_context=True)
+async def clear(ctx, amount=10):
+    channel = ctx.message.channel
+    messages = []
+    async for message in client.logs_from(channel, limit=int(amount)):
+        messages.append(message)
+    await client.delete_messages(messages)
+    await client.say('Messages deleted.')
+
+@client.command()
+async def echo(*args):
+    output = ''
+    for word in args:
+        output += word
+        output += ' '
+    await client.say(output)
+
+client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.DlI6jw.GwvzjCSf1kkSWxPzV_zvnl-w7Lc')
