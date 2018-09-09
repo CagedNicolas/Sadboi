@@ -42,16 +42,17 @@ async def leave(ctx):
 
 @client.command(pass_context=True)
 async def playlist(ctx, pl):
+    await client.say('**Now playing**: %s' % pl)
     print("Now loading playlist database...")
     with open('sbdb.json') as f:
         data = json.load(f)
     print("Database loaded.")
-
     for plname in data:
         if pl in plname['playlist']:
-            songname = plname['songs']
-            await client.say('!play ' + songname)
-            await asyncio.sleep(3)
+            for songname in plname['songs']:
+                await client.say('!play ' + songname)
+                await asyncio.sleep(3)
+    await client.say('**Reached the end of the playlist**')
 
 @client.command(pass_context=True)
 async def clear(ctx, amount=10):
