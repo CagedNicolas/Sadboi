@@ -3,6 +3,8 @@
 A discord bot that saves, loads, and plays playlists for Rythm and other audio bots using the "!" command. 
 However, it still lacks the saving & loading features as it is in pre-alpha phase.
 
+**You can use the `?help` command to know about all available commands**
+
 The bot currently uses "?" as a prefix.
 
 (Bots using different prefixes require modification of files)
@@ -19,11 +21,17 @@ The bot currently uses "?" as a prefix.
 
 5. Repeating messages. (*By using ?echo {message}. Will be removed in future updates*)
 
+6. Adding & removing songs in playlists. (*By using ?addsong & ?rmsong respectively.*)
+
+7. 
+
 ## **Planned features**:
-1. Create, save & modify playlists
+1. Create & erase entire playlists.
 
-2. Shuffle & play playlists
+2. Shuffle & play playlists.
 
-3. Remove playlists
+3. Add error checking.
 
-Currently in pre-alpha phase, whatever that means :)))
+4. Save playlists from Rythm currently playing playlist.
+
+Currently in **pre-alpha phase**

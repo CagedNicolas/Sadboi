@@ -24,6 +24,8 @@ async def on_message(message):
         return
     if message.content.startswith('Say hi faggot'):
         await client.send_message(message.channel, "Hey jews.")
+    if client.user in message.mentions:
+        await client.send_message(message.channel, "Hello! Use the command `?help` to know what my sad ass can do!") # When tagged, will respond.
     await client.process_commands(message)
 
 @client.command(pass_context=True, 
@@ -64,6 +66,23 @@ async def playlist(ctx, pl):
                 await client.say('!play ' + songname)
                 await asyncio.sleep(3)
     await client.say('**Reached the end of the playlist**')
+
+@client.command(pass_context=True, 
+name='movup', 
+description='Moves a song up in a playlist.\nUsed as ?movup **PlaylistName** **SongURL**', 
+brief='Moves a song up in a playlist (Must use song URL) **NOT WORKING**', 
+aliases=['mu','moveup','mup'])
+async def movup(ctx, pl, songurl):
+    pass
+
+@client.command(pass_context=True, 
+name='movdn', 
+description='Moves a song down in a playlist.\nUsed as ?movdn **PlaylistName** **SongURL**', 
+brief='Moves a song down in a playlist (Must use song URL) **NOT WORKING**', 
+aliases=['md','movedown','mdn'])
+async def movdn(ctx, pl, songurl):
+    pass
+
 
 @client.command(pass_context=True, 
 name='addsong', 
