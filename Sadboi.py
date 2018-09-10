@@ -4,6 +4,7 @@ Save playlists to JSON files.
 Make it into docker container to be ran on VPS.
 Saves files by typing in "!playlist sadhours add http://youtube/" 
 Has to monitor channel to know when to play and what.
+await client.process_commands(message) # Bot needs this to continue processing the following client.command(s)
 '''
 import asyncio
 import discord
@@ -21,11 +22,6 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-
-@client.event
-async def on_message(message):
-    print('A user has sent a message.')
-    await client.process_commands(message) # Bot needs this to continue processing the following client.command(s)
 
 @client.command(pass_context=True)
 async def join(ctx):
@@ -55,6 +51,17 @@ async def playlist(ctx, pl):
     await client.say('**Reached the end of the playlist**')
 
 @client.command(pass_context=True)
+async def addsong(ctx, pl, songurl):
+    with open('sbdb.json') as f:
+        data = json.load(f)
+    for plname in data:
+        if pl in plname['playlist']:
+            plname['songs'].append(songurl)
+    await client.say('Song added to %s !' % pl) # Requires error checking
+    with open('sbdb.json', 'r+') as f:
+        json.dump(data, f)
+
+@client.command(pass_context=True)
 async def clear(ctx, amount=10):
     channel = ctx.message.channel
     messages = []
@@ -71,4 +78,4 @@ async def echo(*args):
         output += ' '
     await client.say(output)
 
-client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.DlI6jw.GwvzjCSf1kkSWxPzV_zvnl-w7Lc')
+client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.DnfEiQ._vJy8-IaqWTT3zeEfgU1-SUbArE')
