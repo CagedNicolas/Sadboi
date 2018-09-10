@@ -21,9 +21,9 @@ The bot currently uses "?" as a prefix.
 
 5. Repeating messages. (*By using ?echo {message}. Will be removed in future updates*)
 
-6. Adding & removing songs in playlists. (*By using ?addsong & ?rmsong respectively.*)
+6. Adding & removing songs in playlists. (*By using ?addsong {SongName} & ?rmsong {SongName} respectively.*)
 
-7. Viewing songs in playlists and all playlists. (*By using ?v **PlaylistName** & ?vpl respectively.*)
+7. Viewing songs in playlists and all playlists. (*By using ?v {PlaylistName} & ?vpl respectively.*)
 
 ## **Planned features**:
 1. Create & erase entire playlists.
