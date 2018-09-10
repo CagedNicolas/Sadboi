@@ -23,7 +23,7 @@ The bot currently uses "?" as a prefix.
 
 6. Adding & removing songs in playlists. (*By using ?addsong & ?rmsong respectively.*)
 
-7. 
+7. Viewing songs in playlists and all playlists. (*By using ?v **PlaylistName** & ?vpl respectively.*)
 
 ## **Planned features**:
 1. Create & erase entire playlists.
