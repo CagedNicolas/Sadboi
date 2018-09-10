@@ -64,8 +64,8 @@ async def playlist(ctx, pl):
 
 @client.command(pass_context=True, 
 name='addsong', 
-description='Adds the specified song to the specified playlist.\nUsed as ?addsong **PlaylistName** **SongURL**', 
-brief='Adds songs to playlists', 
+description='Adds the specified song URL to the specified playlist.\nUsed as ?addsong **PlaylistName** **SongURL**', 
+brief='Adds song URLs to playlists', 
 aliases=['add','Addsong','Add','AddSong','addSong'])
 async def addsong(ctx, pl, songurl):
     with open('sbdb.json') as f:
