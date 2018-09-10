@@ -1,9 +1,4 @@
 '''
-Discord bot that saves and plays playlists.
-Save playlists to JSON files.
-Make it into docker container to be ran on VPS.
-Saves files by typing in "!playlist sadhours add http://youtube/" 
-Has to monitor channel to know when to play and what.
 await client.process_commands(message) # Bot needs this to continue processing the following client.command(s)
 '''
 import asyncio
@@ -23,13 +18,21 @@ async def on_ready():
     print(client.user.id)
     print('------')
 
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
+    if message.content.startswith('Say hi faggot'):
+        await client.send_message(message.channel, "Hey jews.")
+    await client.process_commands(message)
+
 @client.command(pass_context=True, 
 name='join', 
 description='Joins VC to allow bots such as Rythm to accept its commands. Used by typing ?join\n**WARNING**: Command user *must* be in VC, otherwise the bot might crash.', 
 brief='Joins VC. **WARNING**: Command user *must* be in VC.', 
 aliases=['Join', 'JOIN', 'getin'])
 async def join(ctx):
-    channel = ctx.message.author.voice.voice_channel # Make error checking incase author isn't in VC
+    channel = ctx.message.author.voice.voice_channel # Add error checking incase author isn't in VC
     await client.say("Joining VC. Make sure you're in VC already!")
     await client.join_voice_channel(channel)
 
@@ -40,7 +43,7 @@ brief='Leaves VC.',
 aliases=['Leave', 'LEAVE', 'fuckoff', 'getout'])
 async def leave(ctx):
     server = ctx.message.server
-    voice_client = client.voice_client_in(server) # Make error checking incase it isn't in a VC
+    voice_client = client.voice_client_in(server) # Add error checking incase it isn't in a VC
     await client.say("Leaving VC. Please give me a moment to collect my things ):")
     await voice_client.disconnect()
 
@@ -93,6 +96,34 @@ async def rmsong(ctx, pl, songurl):
         json.dump(data, f)
 
 @client.command(pass_context=True, 
+name='view', 
+description='View all the songs in a specified playlist.\n Used as ?view **PlaylistName**', 
+brief='View songs in a playlist.', 
+aliases=['v','View'])
+async def view(ctx, pl):
+    with open('sbdb.json') as f:
+        data = json.load(f)
+    for plname in data:
+        if pl in plname['playlist']:
+            for song in plname['songs']:
+                await client.say(song)
+                await asyncio.sleep(1)
+    await client.say('**Reached the end of the playlist**')
+
+@client.command(pass_context=True, 
+name='viewpl', 
+description='View all the playlists.\n Used as ?viewpl', 
+brief='View all playlists.', 
+aliases=['vpl','Viewplaylist','plv'])
+async def viewpl(ctx):
+    with open('sbdb.json') as f:
+        data = json.load(f)
+    for plname in data:
+        await client.say(plname['playlist'])
+        await asyncio.sleep(1)
+    await client.say('**Reached the end of the list**')
+
+@client.command(pass_context=True, 
 name='clear', 
 description='Clears messages by typing ?clear **amount**.\nDefault amount is 10 messages. *Requires mod status*.', 
 brief='Clears messages.')
@@ -112,4 +143,4 @@ async def echo(*args):
         output += ' '
     await client.say(output)
 
-client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.DnfEiQ._vJy8-IaqWTT3zeEfgU1-SUbArE')
+client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.DnfW0w.TVoPzWejzPfZW1-9nNKmUhjkPH8')
