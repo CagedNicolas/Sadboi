@@ -73,7 +73,22 @@ description='Moves a song up in a playlist.\nUsed as ?movup **PlaylistName** **S
 brief='Moves a song up in a playlist (Must use song URL) **NOT WORKING**', 
 aliases=['mu','moveup','mup'])
 async def movup(ctx, pl, songurl):
-    pass
+    print("Now loading playlist database...")
+    with open('sbdb.json') as f:
+        data = json.load(f)
+    for plname in data:
+        if pl in plname['playlist']:
+            if songurl in plname['songs']:
+                old_index = plname['songs'].index(songurl)
+                if old_index > 0:
+                    del plname['songs'][old_index]
+                    new_index = int(old_index) - 1
+                    plname['songs'].insert(new_index, songurl)
+                    with open('sbdb.json', 'w') as f:
+                        json.dump(data, f)
+                    await client.say("Song successfully moved!")
+                else:
+                    await client.say("The song you chose is already at the top of the playlist!")
 
 @client.command(pass_context=True, 
 name='movdn', 
@@ -81,7 +96,24 @@ description='Moves a song down in a playlist.\nUsed as ?movdn **PlaylistName** *
 brief='Moves a song down in a playlist (Must use song URL) **NOT WORKING**', 
 aliases=['md','movedown','mdn'])
 async def movdn(ctx, pl, songurl):
-    pass
+    print("Now loading playlist database...")
+    with open('sbdb.json') as f:
+        data = json.load(f)
+    for plname in data:
+        if pl in plname['playlist']:
+            if songurl in plname['songs']:
+                old_index = plname['songs'].index(songurl)
+                last_element = plname['songs'][-1]
+                last_index = plname['songs'].index(last_element)
+                if old_index < last_index:
+                    del plname['songs'][old_index]
+                    new_index = int(old_index) + 1
+                    plname['songs'].insert(new_index, songurl)
+                    with open('sbdb.json', 'w') as f:
+                        json.dump(data, f)
+                    await client.say("Song successfully moved!")
+                else:
+                    await client.say("The song you chose is already at the bottom of the playlist!")
 
 
 @client.command(pass_context=True, 
@@ -162,4 +194,4 @@ async def echo(*args):
         output += ' '
     await client.say(output)
 
-client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.DnfW0w.TVoPzWejzPfZW1-9nNKmUhjkPH8')
+client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.Dnhx1A.wXPfenUi92pZyRFv0wHcg_jb05I')
