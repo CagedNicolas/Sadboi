@@ -7,6 +7,7 @@ from discord.ext import commands
 from discord.ext.commands import Bot
 from discord.voice_client import VoiceClient
 import json
+import random
 
 client = commands.Bot(command_prefix='?')
 
@@ -67,10 +68,31 @@ async def playlist(ctx, pl):
                 await asyncio.sleep(3)
     await client.say('**Reached the end of the playlist**')
 
+@client.command(pass_context=True,
+name='createplaylist',
+description='Create a new playlist. Use command ?addsong to add to the playlist after creation \nUsed as ?createplaylist **PlaylistName** **SongURL**',
+brief='Creates a new playlist.',
+aliases=['newpl','npl','createpl','cpl','cplaylist'])
+async def createplaylist(ctx, pl, songurl):
+    with open('sbdb.json') as f:
+        data = json.load(f)
+    for plname in data:
+        if pl not in plname['playlist']: # Check if playlist doesn't already exist
+            newpl = {}
+            newpl['playlist'] = pl
+            newpl['songs'] = [songurl]
+            data.append(newpl)
+            await client.say('Playlist created!')
+            with open('sbdb.json', 'r+') as f:
+                json.dump(data, f)
+            break
+        else:
+            await client.say('Playlist already exists!') # DOESNT WORK, PLEASE FIX
+
 @client.command(pass_context=True, 
 name='movup', 
 description='Moves a song up in a playlist.\nUsed as ?movup **PlaylistName** **SongURL**', 
-brief='Moves a song up in a playlist (Must use song URL) **NOT WORKING**', 
+brief='Moves a song up in a playlist (Must use song URL)', 
 aliases=['mu','moveup','mup'])
 async def movup(ctx, pl, songurl):
     print("Now loading playlist database...")
@@ -93,7 +115,7 @@ async def movup(ctx, pl, songurl):
 @client.command(pass_context=True, 
 name='movdn', 
 description='Moves a song down in a playlist.\nUsed as ?movdn **PlaylistName** **SongURL**', 
-brief='Moves a song down in a playlist (Must use song URL) **NOT WORKING**', 
+brief='Moves a song down in a playlist (Must use song URL)', 
 aliases=['md','movedown','mdn'])
 async def movdn(ctx, pl, songurl):
     print("Now loading playlist database...")
@@ -114,7 +136,6 @@ async def movdn(ctx, pl, songurl):
                     await client.say("Song successfully moved!")
                 else:
                     await client.say("The song you chose is already at the bottom of the playlist!")
-
 
 @client.command(pass_context=True, 
 name='addsong', 
@@ -156,9 +177,11 @@ async def view(ctx, pl):
         data = json.load(f)
     for plname in data:
         if pl in plname['playlist']:
+            songlist = ''
             for song in plname['songs']:
-                await client.say(song)
-                await asyncio.sleep(1)
+                songlist += song + '\n'
+    await client.say(songlist)
+    await asyncio.sleep(1)
     await client.say('**Reached the end of the playlist**')
 
 @client.command(pass_context=True, 
@@ -169,10 +192,27 @@ aliases=['vpl','Viewplaylist','plv'])
 async def viewpl(ctx):
     with open('sbdb.json') as f:
         data = json.load(f)
+    pllist = ''
     for plname in data:
-        await client.say(plname['playlist'])
-        await asyncio.sleep(1)
+        pllist += plname['playlist'] + '\n'
+    await client.say(pllist)
+    await asyncio.sleep(1)
     await client.say('**Reached the end of the list**')
+
+@client.command(pass_context=True,
+name='shuffleplay',
+description='Plays shuffles and plays a specified playlist. \nUsed as ?shuffleplay **PlaylistName**',
+brief='Shuffles & plays playlists.',
+aliases=['sp','shufflep','splay'])
+async def shuffleplay(ctx, pl):
+    with open('sbdb.json') as f:
+        data = json.load(f)
+    for plname in data:
+        if pl in plname['playlist']:
+            random.shuffle(plname['songs'])
+            for songname in plname['songs']:
+                await client.say('!play ' + songname)
+                await asyncio.sleep(3)
 
 @client.command(pass_context=True, 
 name='clear', 
@@ -194,4 +234,4 @@ async def echo(*args):
         output += ' '
     await client.say(output)
 
-client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.Dnhx1A.wXPfenUi92pZyRFv0wHcg_jb05I')
+client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.DnkoHw.7qLnjZijA-Gbn4O6TiDTmwV0rAs')
