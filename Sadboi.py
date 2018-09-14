@@ -27,6 +27,8 @@ async def on_message(message):
         await client.send_message(message.channel, "Hey jews.")
     if client.user in message.mentions:
         await client.send_message(message.channel, "Hello! Use the command `?help` to know what my sad ass can do!") # When tagged, will respond.
+    if message.content.startswith('PLAY NATIONAL ANTHEM') or message.content.startswith('Play national anthem') or message.content.startswith('bot play national anthem') or message.content.startswith('Bot play national anthem'):
+        await client.send_message(message.channel, "https://www.youtube.com/watch?v=9fA9IpeWZUI")
     await client.process_commands(message)
 
 @client.command(pass_context=True, 
@@ -89,6 +91,23 @@ async def createplaylist(ctx, pl, songurl):
         else:
             await client.say('Playlist already exists!') # DOESNT WORK, PLEASE FIX
 
+@client.command(pass_context=True,
+name='deleteplaylist',
+description='Deletes a playlist. \nUsed as ?deleteplaylist **PlaylistName**',
+brief='Deletes an existing playlist.',
+aliases=['dpl','delpl','delplaylist','dplaylist'])
+async def deleteplaylist(ctx, pl):
+    with open('sbdb.json') as f:
+        data = json.load(f)
+    #to_keep = [plname for plname in data if pl not in plname['playlist']]
+    to_keep = []
+    for plname in data:
+        if pl not in plname['playlist']:
+            to_keep.append(plname)
+    with open('sbdb.json', 'w') as f:
+        json.dump(to_keep, f)
+    await client.say('Playlist erased!')
+
 @client.command(pass_context=True, 
 name='movup', 
 description='Moves a song up in a playlist.\nUsed as ?movup **PlaylistName** **SongURL**', 
@@ -149,7 +168,7 @@ async def addsong(ctx, pl, songurl):
         if pl in plname['playlist']:
             plname['songs'].append(songurl)
     await client.say('Song added to %s!' % pl) # Requires error checking
-    with open('sbdb.json', 'r+') as f:
+    with open('sbdb.json', 'w') as f:
         json.dump(data, f)
 
 @client.command(pass_context=True, 
@@ -234,4 +253,4 @@ async def echo(*args):
         output += ' '
     await client.say(output)
 
-client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.DnkoHw.7qLnjZijA-Gbn4O6TiDTmwV0rAs')
+client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.Dnp-UQ.QO3ik8MavB1_GRSST3s2tAm9sS8')
