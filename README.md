@@ -11,27 +11,29 @@ The bot currently uses "?" as a prefix.
 
 
 ## **Current features & how to use them**:
-1. Logging messages automatically (*Vague, and will be removed in future updates*)
+1. Joining and leaving VC (*By using ?join & ?leave commands respectively*)
 
-2. Joining and leaving VC (*By using ?join & ?leave commands respectively*)
+2. Playing playlists by typing "!play {NameofPlaylist}"  by iterating through sbdb.json for the song names in the specified playlist. (*By using ?playlist "NameofPlayList". Currently saved playlists are only placeholders for testing purposes*)
 
-3. Playing playlists by typing "!play {NameofPlaylist}"  by iterating through sbdb.json for the song names in the specified playlist. (*By using ?playlist "NameofPlayList". Currently saved playlists are only placeholders for testing purposes*)
+3. Clearing messages. Requires mod powers. (*By using ?clear {amount}. Default amount is 10.*)
 
-4. Clearing messages. Requires mod powers. (*By using ?clear {amount}. Default amount is 10. Will be removed in future updates*)
+4. Repeating messages. (*By using ?echo {message}.*)
 
-5. Repeating messages. (*By using ?echo {message}. Will be removed in future updates*)
+5. Adding & removing songs in playlists. (*By using ?addsong {SongName} & ?rmsong {SongName} respectively.*)
 
-6. Adding & removing songs in playlists. (*By using ?addsong {SongName} & ?rmsong {SongName} respectively.*)
+6. Viewing songs in playlists and all playlists. (*By using ?v {PlaylistName} & ?vpl respectively.*)
 
-7. Viewing songs in playlists and all playlists. (*By using ?v {PlaylistName} & ?vpl respectively.*)
+7. Creating & deleting playlists. (*By using ?cpl {PlaylistName} and ?dpl {PlaylistName} respectively*)
+
+8. Moving songs up and down in a specific playlist. (*By using ?movup {PlaylistName} {SongName} and ?movdn {PlaylistName} {SongName} respectively*)
+
+9. Shuffling, and playing a specific playlist. (*By using ?shuffleplay {PlaylistName}*)
 
 ## **Planned features**:
-1. Create & erase entire playlists.
+1. Add error checking.
 
-2. Shuffle & play playlists.
+2. Save playlists from Rythm currently playing playlist.
 
-3. Add error checking.
-
-4. Save playlists from Rythm currently playing playlist.
+3. Remove case sensitivity for playlists & songs, while also allowing spaces to be saved in the database.
 
 Currently in **pre-alpha phase**

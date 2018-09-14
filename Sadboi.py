@@ -95,7 +95,7 @@ async def createplaylist(ctx, pl, songurl):
 name='deleteplaylist',
 description='Deletes a playlist. \nUsed as ?deleteplaylist **PlaylistName**',
 brief='Deletes an existing playlist.',
-aliases=['dpl','delpl','delplaylist','dplaylist'])
+aliases=['dpl','delpl','delplaylist','dplaylist','rmpl'])
 async def deleteplaylist(ctx, pl):
     with open('sbdb.json') as f:
         data = json.load(f)
@@ -253,4 +253,4 @@ async def echo(*args):
         output += ' '
     await client.say(output)
 
-client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.Dnp-UQ.QO3ik8MavB1_GRSST3s2tAm9sS8')
+client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.Dn0vTg.khj32GXFxUKZm4WI9N2Ubav9jkM')
