@@ -99,10 +99,11 @@ async def createplaylist(ctx, pl, songurl):
             newpl['playlist'] = pl
             newpl['songs'] = [songurl]
             data.append(newpl)
-            await client.say('Playlist created!')
-            with open('sbdb.json', 'r+') as f:
+            with open('sbdb.json', 'w') as f:
                 json.dump(data, f)
-        else:
+            await client.say('Playlist created!')
+            break # Else it loops back for some reason
+        elif pl in plname['playlist']:
             await client.say('Playlist already exists!') # DOESNT WORK, PLEASE FIX
 
 @client.command(pass_context=True,
@@ -123,52 +124,31 @@ async def deleteplaylist(ctx, pl):
     await client.say('Playlist erased!')
 
 @client.command(pass_context=True, 
-name='movup', 
-description='Moves a song up in a playlist.\nUsed as ?movup **PlaylistName** **SongURL**', 
+name='move', 
+description='Moves a song up/down in a playlist.\nUsed as ?move **Up/Down** **PlaylistName** **SongURL**', 
 brief='Moves a song up in a playlist (Must use song URL)', 
-aliases=['mu','moveup','mup'])
-async def movup(ctx, pl, songurl):
+aliases=['mov','m'])
+async def move(ctx, pl, oldindex, newindex):
     print("Now loading playlist database...")
     with open('sbdb.json') as f:
         data = json.load(f)
+    oldindex = int(oldindex)
+    newindex = int(newindex)
+    oldindex -= 1
+    newindex -= 1
     for plname in data:
         if pl in plname['playlist']:
-            if songurl in plname['songs']:
-                old_index = plname['songs'].index(songurl)
-                if old_index > 0:
-                    del plname['songs'][old_index]
-                    new_index = int(old_index) - 1
-                    plname['songs'].insert(new_index, songurl)
-                    with open('sbdb.json', 'w') as f:
-                        json.dump(data, f)
-                    await client.say("Song successfully moved!")
-                else:
-                    await client.say("The song you chose is already at the top of the playlist!")
-
-@client.command(pass_context=True, 
-name='movdn', 
-description='Moves a song down in a playlist.\nUsed as ?movdn **PlaylistName** **SongURL**', 
-brief='Moves a song down in a playlist (Must use song URL)', 
-aliases=['md','movedown','mdn'])
-async def movdn(ctx, pl, songurl):
-    print("Now loading playlist database...")
-    with open('sbdb.json') as f:
-        data = json.load(f)
-    for plname in data:
-        if pl in plname['playlist']:
-            if songurl in plname['songs']:
-                old_index = plname['songs'].index(songurl)
-                last_element = plname['songs'][-1]
-                last_index = plname['songs'].index(last_element)
-                if old_index < last_index:
-                    del plname['songs'][old_index]
-                    new_index = int(old_index) + 1
-                    plname['songs'].insert(new_index, songurl)
-                    with open('sbdb.json', 'w') as f:
-                        json.dump(data, f)
-                    await client.say("Song successfully moved!")
-                else:
-                    await client.say("The song you chose is already at the bottom of the playlist!")
+            song = plname['songs'][oldindex]
+            last_element = plname['songs'][-1]
+            last_index = plname['songs'].index(last_element)
+            if oldindex > last_index or oldindex < 0:
+                await client.say("Incorrect index given! Please try again.")
+            else:
+                del plname['songs'][oldindex]
+                plname['songs'].insert(newindex, song)
+                with open('sbdb.json', 'w') as f:
+                    json.dump(data, f)
+                await client.say("Song successfully moved!")
 
 @client.command(pass_context=True, 
 name='addsong', 
@@ -211,8 +191,10 @@ async def view(ctx, pl):
     for plname in data:
         if pl in plname['playlist']:
             songlist = ''
+            counter = 1 # More pythonic pl0x?
             for song in plname['songs']:
-                songlist += song + '\n'
+                songlist += str(counter) + ". " + song + '\n'
+                counter += 1
     await client.say(songlist)
     await asyncio.sleep(1)
     await client.say('**Reached the end of the playlist**')
