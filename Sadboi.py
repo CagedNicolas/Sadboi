@@ -8,6 +8,9 @@ from discord.ext.commands import Bot
 from discord.voice_client import VoiceClient
 import json
 import random
+import traceback, logging
+
+logging.basicConfig(filename='output.log', filemode='w', level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s') # Logging
 
 client = commands.Bot(command_prefix='?')
 
@@ -18,6 +21,12 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
+
+@client.event
+async def on_error(event, *args, **kwargs):
+    message = args[0]
+    logging.warning(traceback.format_exc())
+    await client.send_message(message.channel, "You just caused an error!")
 
 @client.event
 async def on_message(message):
@@ -37,9 +46,12 @@ description='Joins VC to allow bots such as Rythm to accept its commands. Used b
 brief='Joins VC. **WARNING**: Command user *must* be in VC.', 
 aliases=['Join', 'JOIN', 'getin'])
 async def join(ctx):
-    channel = ctx.message.author.voice.voice_channel # Add error checking incase author isn't in VC
-    await client.say("Joining VC. Make sure you're in VC already!")
-    await client.join_voice_channel(channel)
+    channel = ctx.message.author.voice.voice_channel
+    try:
+        await client.join_voice_channel(channel)
+        await client.say("Joining VC.")
+    except:
+        await client.say("Please make sure you're in VC then try again!")
 
 @client.command(pass_context=True, 
 name='leave', 
@@ -48,9 +60,12 @@ brief='Leaves VC.',
 aliases=['Leave', 'LEAVE', 'fuckoff', 'getout'])
 async def leave(ctx):
     server = ctx.message.server
-    voice_client = client.voice_client_in(server) # Add error checking incase it isn't in a VC
-    await client.say("Leaving VC. Please give me a moment to collect my things ):")
-    await voice_client.disconnect()
+    voice_client = client.voice_client_in(server)
+    try:
+        await voice_client.disconnect()
+        await client.say("Leaving VC. Please give me a moment to collect my things ):")
+    except:
+        await client.say("I'm not even in VC! ):")
 
 @client.command(pass_context=True, 
 name='playlist', 
@@ -87,7 +102,6 @@ async def createplaylist(ctx, pl, songurl):
             await client.say('Playlist created!')
             with open('sbdb.json', 'r+') as f:
                 json.dump(data, f)
-            break
         else:
             await client.say('Playlist already exists!') # DOESNT WORK, PLEASE FIX
 
@@ -253,4 +267,4 @@ async def echo(*args):
         output += ' '
     await client.say(output)
 
-client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.Dn0vTg.khj32GXFxUKZm4WI9N2Ubav9jkM')
+client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.Dn011Q.dZ5wBuYVPF7kckuKYqcEvv2NJgU')
