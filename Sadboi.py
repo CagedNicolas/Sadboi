@@ -9,6 +9,7 @@ from discord.voice_client import VoiceClient
 import json
 import random
 import traceback, logging
+import datetime
 
 logging.basicConfig(filename='output.log', filemode='w', level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s') # Logging
 
@@ -49,7 +50,7 @@ async def join(ctx):
     channel = ctx.message.author.voice.voice_channel
     try:
         await client.join_voice_channel(channel)
-        await client.say("Joining VC.")
+        await client.say("Joined VC.")
     except:
         await client.say("Please make sure you're in VC then try again!")
 
@@ -63,8 +64,8 @@ async def leave(ctx):
     voice_client = client.voice_client_in(server)
     try:
         await voice_client.disconnect()
-        await client.say("Leaving VC. Please give me a moment to collect my things ):")
-    except:
+        await client.say("Collected my things and left VC. ):")
+    except AttributeError:
         await client.say("I'm not even in VC! ):")
 
 @client.command(pass_context=True, 
@@ -74,7 +75,7 @@ brief='Plays the specified playlist.',
 aliases=['Playlist','PlayList','pl', 'play'])
 async def playlist(ctx, pl):
     await client.say('**Now playing**: %s' % pl)
-    print("Now loading playlist database...")
+    pl = pl.lower()
     with open('sbdb.json') as f:
         data = json.load(f)
     print("Database loaded.")
@@ -93,18 +94,23 @@ aliases=['newpl','npl','createpl','cpl','cplaylist'])
 async def createplaylist(ctx, pl, songurl):
     with open('sbdb.json') as f:
         data = json.load(f)
-    for plname in data:
-        if pl not in plname['playlist']: # Check if playlist doesn't already exist
-            newpl = {}
-            newpl['playlist'] = pl
-            newpl['songs'] = [songurl]
-            data.append(newpl)
-            with open('sbdb.json', 'w') as f:
-                json.dump(data, f)
-            await client.say('Playlist created!')
-            break # Else it loops back for some reason
-        elif pl in plname['playlist']:
-            await client.say('Playlist already exists!') # DOESNT WORK, PLEASE FIX
+    pl = pl.lower()
+    try:
+        for plname in data:
+            if pl == plname['playlist']:
+                await client.say('Playlist already exists!') # DOESNT WORK, PLEASE FIX
+                break
+            elif pl not in plname['playlist']: # Check if playlist doesn't already exist
+                newpl = {}
+                newpl['playlist'] = pl
+                newpl['songs'] = [songurl]
+                data.append(newpl)
+                with open('sbdb.json', 'w') as f:
+                    json.dump(data, f)
+                await client.say('Playlist created!')
+                break # Else it loops back for some reason
+    except:
+        await client.say("Error! Missing arguments.")
 
 @client.command(pass_context=True,
 name='deleteplaylist',
@@ -116,6 +122,7 @@ async def deleteplaylist(ctx, pl):
         data = json.load(f)
     #to_keep = [plname for plname in data if pl not in plname['playlist']]
     to_keep = []
+    pl = pl.lower()
     for plname in data:
         if pl not in plname['playlist']:
             to_keep.append(plname)
@@ -123,32 +130,56 @@ async def deleteplaylist(ctx, pl):
         json.dump(to_keep, f)
     await client.say('Playlist erased!')
 
-@client.command(pass_context=True, 
-name='move', 
-description='Moves a song up/down in a playlist.\nUsed as ?move **Up/Down** **PlaylistName** **SongURL**', 
-brief='Moves a song up in a playlist (Must use song URL)', 
-aliases=['mov','m'])
-async def move(ctx, pl, oldindex, newindex):
-    print("Now loading playlist database...")
+@client.command(pass_context=True,
+name='renamepl',
+description='Renames a playlist.\nUsed as ?renamepl **OldPlaylistName** **NewPlaylistName**',
+brief='Renames a playlist',
+aliases=['rnmpl','renameplaylist','rnmplaylist','mvpl','mv'])
+async def renamepl(ctx, plo, pln):
     with open('sbdb.json') as f:
         data = json.load(f)
+    plo = plo.lower()
+    pln = pln.lower()
+    for plname in data:
+        if plo == plname['playlist']:
+            plname['playlist'] = pln
+            with open('sbdb.json', 'w') as f:
+                json.dump(data, f)
+            await client.say("Playlist renamed!")
+            break
+
+@client.command(pass_context=True, 
+name='move', 
+description='Moves a song up/down in a playlist.\nUsed as ?move **PlaylistName** **SongIndex** **NewIndex**', 
+brief='Moves a song up/down in a playlist (Must use song number)', 
+aliases=['mov','m'])
+async def move(ctx, pl, oldindex, newindex):
+    with open('sbdb.json') as f:
+        data = json.load(f)
+    pl = pl.lower()
     oldindex = int(oldindex)
     newindex = int(newindex)
     oldindex -= 1
     newindex -= 1
     for plname in data:
         if pl in plname['playlist']:
-            song = plname['songs'][oldindex]
-            last_element = plname['songs'][-1]
-            last_index = plname['songs'].index(last_element)
-            if oldindex > last_index or oldindex < 0:
-                await client.say("Incorrect index given! Please try again.")
-            else:
-                del plname['songs'][oldindex]
-                plname['songs'].insert(newindex, song)
-                with open('sbdb.json', 'w') as f:
-                    json.dump(data, f)
-                await client.say("Song successfully moved!")
+            try:
+                song = plname['songs'][oldindex]
+                last_element = plname['songs'][-1]
+                last_index = plname['songs'].index(last_element)
+                if oldindex > last_index or oldindex < 0 or newindex > last_index or newindex < 0:
+                    await client.say("Incorrect index given! Please try again.")
+                    break
+                else:
+                    del plname['songs'][oldindex]
+                    plname['songs'].insert(newindex, song)
+                    with open('sbdb.json', 'w') as f:
+                        json.dump(data, f)
+                    await client.say("Song successfully moved!")
+                    break
+            except IndexError:
+                await client.say("Incorrect index given! Please try again.") # Recycled shit from line 170.
+                break
 
 @client.command(pass_context=True, 
 name='addsong', 
@@ -158,10 +189,11 @@ aliases=['add','Addsong','Add','AddSong','addSong'])
 async def addsong(ctx, pl, songurl):
     with open('sbdb.json') as f:
         data = json.load(f)
+    pl = pl.lower()
     for plname in data:
         if pl in plname['playlist']:
             plname['songs'].append(songurl)
-    await client.say('Song added to %s!' % pl) # Requires error checking
+    await client.say('Song added to %s!' % pl)
     with open('sbdb.json', 'w') as f:
         json.dump(data, f)
 
@@ -173,12 +205,16 @@ aliases=['rm','del','delete','erase','delsong'])
 async def rmsong(ctx, pl, songurl):
     with open('sbdb.json') as f:
         data = json.load(f)
+    pl = pl.lower()
     for plname in data:
-        if pl in plname['playlist']:
-            plname['songs'].remove(songurl)
-    await client.say('Song removed from %s!' % pl) # Requires error checking
-    with open('sbdb.json', 'w') as f:
-        json.dump(data, f)
+        try:
+            if pl in plname['playlist']:
+                plname['songs'].remove(songurl)
+                await client.say('Song removed from %s!' % pl)
+            with open('sbdb.json', 'w') as f:
+                json.dump(data, f)
+        except ValueError:
+            await client.say("Song not found!")
 
 @client.command(pass_context=True, 
 name='view', 
@@ -188,6 +224,7 @@ aliases=['v','View'])
 async def view(ctx, pl):
     with open('sbdb.json') as f:
         data = json.load(f)
+    pl = pl.lower()
     for plname in data:
         if pl in plname['playlist']:
             songlist = ''
@@ -195,9 +232,7 @@ async def view(ctx, pl):
             for song in plname['songs']:
                 songlist += str(counter) + ". " + song + '\n'
                 counter += 1
-    await client.say(songlist)
-    await asyncio.sleep(1)
-    await client.say('**Reached the end of the playlist**')
+    await client.say(songlist + "**Reached the end of the playlist**")
 
 @client.command(pass_context=True, 
 name='viewpl', 
@@ -210,9 +245,7 @@ async def viewpl(ctx):
     pllist = ''
     for plname in data:
         pllist += plname['playlist'] + '\n'
-    await client.say(pllist)
-    await asyncio.sleep(1)
-    await client.say('**Reached the end of the list**')
+    await client.say(pllist + '**Reached the end of the list**')
 
 @client.command(pass_context=True,
 name='shuffleplay',
@@ -222,6 +255,7 @@ aliases=['sp','shufflep','splay'])
 async def shuffleplay(ctx, pl):
     with open('sbdb.json') as f:
         data = json.load(f)
+    pl = pl.lower()
     for plname in data:
         if pl in plname['playlist']:
             random.shuffle(plname['songs'])
@@ -249,4 +283,4 @@ async def echo(*args):
         output += ' '
     await client.say(output)
 
-client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.Dn011Q.dZ5wBuYVPF7kckuKYqcEvv2NJgU')
+client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.DoBlmw.F03w07D4ljJLAFfjUa9dgecASIQ')
