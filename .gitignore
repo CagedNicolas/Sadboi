@@ -1,2 +1,4 @@
 sadboibackup.py
 output.log
+__pycache__
+async_error_handler.py

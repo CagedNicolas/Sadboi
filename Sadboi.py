@@ -8,12 +8,14 @@ from discord.ext.commands import Bot
 from discord.voice_client import VoiceClient
 import json
 import random
-import traceback, logging
+import traceback, logging, sys
 import datetime
 
 logging.basicConfig(filename='output.log', filemode='w', level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s') # Logging
 
 client = commands.Bot(command_prefix='?')
+
+startup_extension = ['async_error_handler']
 
 @client.event
 async def on_ready():
@@ -22,12 +24,6 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-
-@client.event
-async def on_error(event, *args, **kwargs):
-    message = args[0]
-    logging.warning(traceback.format_exc())
-    await client.send_message(message.channel, "You just caused an error!")
 
 @client.event
 async def on_message(message):
@@ -95,22 +91,16 @@ async def createplaylist(ctx, pl, songurl):
     with open('sbdb.json') as f:
         data = json.load(f)
     pl = pl.lower()
-    try:
-        for plname in data:
-            if pl == plname['playlist']:
-                await client.say('Playlist already exists!') # DOESNT WORK, PLEASE FIX
-                break
-            elif pl not in plname['playlist']: # Check if playlist doesn't already exist
-                newpl = {}
-                newpl['playlist'] = pl
-                newpl['songs'] = [songurl]
-                data.append(newpl)
-                with open('sbdb.json', 'w') as f:
-                    json.dump(data, f)
-                await client.say('Playlist created!')
-                break # Else it loops back for some reason
-    except:
-        await client.say("Error! Missing arguments.")
+    if not any(plname.get('playlist') == pl for plname in data):# If doesnt exist
+        newpl = {}
+        newpl['playlist'] = pl
+        newpl['songs'] = [songurl]
+        data.append(newpl)
+        with open('sbdb.json', 'w') as f:
+            json.dump(data, f)
+        await client.say('Playlist created!') 
+    elif any(plname.get('playlist') == pl for plname in data):
+        await client.say('Playlist already exists!')# Else it loops back for some reason
 
 @client.command(pass_context=True,
 name='deleteplaylist',
@@ -283,4 +273,14 @@ async def echo(*args):
         output += ' '
     await client.say(output)
 
-client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.DoBlmw.F03w07D4ljJLAFfjUa9dgecASIQ')
+if __name__ == "__main__":
+    for extension in startup_extension:
+        try:
+            print('Loading {}...'.format(extension))
+            client.load_extension(extension)
+            print("{} loaded.".format(extension))
+        except Exception as e:
+            exc = '{}: {}'.format(type(e).__name__, e)
+            print('Failed to load extension {}\n{}'.format(extension, exc))
+
+client.run('NDc4MzE1MzM0MzI4Mzg1NTM3.DoEWeg.XTF4sVr31N1X-m8CFoq3YCj2SzM')
