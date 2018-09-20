@@ -15,7 +15,7 @@ logging.basicConfig(filename='output.log', filemode='w', level=logging.INFO, for
 
 client = commands.Bot(command_prefix='?')
 
-startup_extension = ['async_error_handler']
+startup_extension = ['cogs.CommandErrorHandler']
 
 @client.event
 async def on_ready():
